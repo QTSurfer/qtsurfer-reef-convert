@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wualabs.qtsurfer</groupId>
+    <artifactId>lastra-convert</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>QTSurfer Lastra Convert</name>
+    <description>Convert time series data to Lastra format. Supports Parquet input (via parquet-lite),
+        with extensible design for additional sources (CSV, etc.).</description>
+    <url>https://github.com/QTSurfer/lastra-convert</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:QTSurfer/lastra-convert.git</connection>
+        <url>scm:git:git@github.com:QTSurfer/lastra-convert.git</url>
+        <developerConnection>scm:git:git@github.com:QTSurfer/lastra-convert.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>mrmx</name>
+            <organization>Wualabs</organization>
+            <organizationUrl>https://wualabs.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>11</maven.compiler.release>
+        <lastra.version>0.8.1</lastra.version>
+        <parquet-lite.version>2.0.0</parquet-lite.version>
+        <junit.version>5.11.4</junit.version>
+        <assertj.version>3.27.3</assertj.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!--
+            JitPack coordinates: sibling Lastra + parquet-lite repos are built + served
+            by jitpack.io (see the <repositories> block above). When we eventually
+            publish these to Maven Central we'll switch back to com.wualabs.qtsurfer as
+            the canonical groupId — the lastra-convert/api-rest-vertx coords would
+            follow suit. For now JitPack lets OSS consumers resolve the whole tree
+            without any local mvn install of sibling repos.
+        -->
+        <dependency>
+            <groupId>com.github.QTSurfer</groupId>
+            <artifactId>lastra-java</artifactId>
+            <version>${lastra.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.QTSurfer</groupId>
+            <artifactId>parquet-lite</artifactId>
+            <version>${parquet-lite.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>3.3.6</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.wualabs.qtsurfer.lastra.convert.Main</mainClass>
+                                </transformer>
+                            </transformers>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
